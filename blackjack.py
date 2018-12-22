@@ -13,10 +13,14 @@ root = tk.Tk()
 root.title("Blackjack (Simplified)")
 
 # Create the static labels
+dealerHandLabel = ttk.Label(root, text="Dealer's Hand:", width=12)
+dealerHandLabel.grid(row=0, column=0)
 dealerCountLabel = ttk.Label(root, text="Dealer's Count:", width=12)
-dealerCountLabel.grid(row=0, column=0)
+dealerCountLabel.grid(row=1, column=0)
+playerHandLabel = ttk.Label(root, text="Player's Hand:", width=12)
+playerHandLabel.grid(row=2, column=0)
 playerCountLabel = ttk.Label(root, text="Player's Count:", width=12)
-playerCountLabel.grid(row=1, column=0)
+playerCountLabel.grid(row=3, column=0)
 
 # Create the variables
 dealerCountInt = tk.IntVar()
@@ -26,20 +30,31 @@ playerCountInt.set(0)
 gameStateStr = tk.StringVar()
 gameStateStr.set("Click \'New Game\' to start")
 
+playerHandStr = tk.StringVar()
+dealerHandStr = tk.StringVar()
+
 # Create the variable labels
 dealerCountVarLabel = ttk.Label(root, textvariable=dealerCountInt)
-dealerCountVarLabel.grid(row=0, column=1)
+dealerCountVarLabel.grid(row=1, column=1)
 playerCountVarLabel = ttk.Label(root, textvariable=playerCountInt)
-playerCountVarLabel.grid(row=1, column=1)
+playerCountVarLabel.grid(row=3, column=1)
 gameStateVarLabel = ttk.Label(root, textvariable=gameStateStr)
-gameStateVarLabel.grid(row=2, column=0, columnspan=2)
+gameStateVarLabel.grid(row=4, column=0, columnspan=2)
+
+playerHandVarLabel = ttk.Label(root, textvariable=playerHandStr, anchor="w")
+playerHandVarLabel.grid(row=2, column=1)
+dealerHandVarLabel = ttk.Label(root, textvariable=dealerHandStr)
+dealerHandVarLabel.grid(row=0, column=1)
 
 # Define the button functions
 
 
 def stand():
     while dealerCountInt.get() < 17:
-        dealerCountInt.set(dealerCountInt.get()+deal())
+        dealerCardInt = deal()
+        dealerCardStr = str(dealerCardInt)
+        dealerCountInt.set(dealerCountInt.get()+dealerCardInt)
+        dealerHandStr.set(dealerHandStr.get() + ", " + dealerCardStr)
         root.update()
         time.sleep(0.5)
     checkGameState()
@@ -47,14 +62,24 @@ def stand():
 
 
 def hit():
-    playerCountInt.set(playerCountInt.get()+deal())
+    cardInt = deal()
+    cardStr = str(cardInt)
+    playerCountInt.set(playerCountInt.get()+cardInt)
+    playerHandStr.set(playerHandStr.get()+", "+cardStr)
     checkPlayerBust()
     return
 
 
 def newGame():
-    dealerCountInt.set(deal())
-    playerCountInt.set(deal())
+    playerCardInt = deal()
+    playerCardStr = str(playerCardInt)
+    dealerCardInt = deal()
+    dealerCardStr = str(dealerCardInt)
+
+    dealerCountInt.set(dealerCardInt)
+    dealerHandStr.set(dealerCardStr)
+    playerCountInt.set(playerCardInt)
+    playerHandStr.set(playerCardStr)
     gameStateStr.set("Game on")
     hitButton.config(state=tk.NORMAL)
     standButton.config(state=tk.NORMAL)
@@ -63,13 +88,13 @@ def newGame():
 
 # Create the buttons
 hitButton = ttk.Button(root, text="Hit", command=hit, state=tk.DISABLED)
-hitButton.grid(row=3, column=0)
+hitButton.grid(row=5, column=0)
 standButton = ttk.Button(root, text="Stand", command=stand, state=tk.DISABLED)
-standButton.grid(row=3, column=1)
+standButton.grid(row=5, column=1)
 newGameButton = ttk.Button(root, text="New Game", command=newGame)
-newGameButton.grid(row=4, column=0)
+newGameButton.grid(row=6, column=0)
 exitButton = ttk.Button(root, text="Exit", command=quit)
-exitButton.grid(row=4, column=1)
+exitButton.grid(row=6, column=1)
 
 # Add some space between the widgets
 for child in root.winfo_children():
