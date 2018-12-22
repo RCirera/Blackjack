@@ -51,8 +51,7 @@ dealerHandVarLabel.grid(row=0, column=1)
 
 def stand():
     while dealerCountInt.get() < 17:
-        dealerCardInt = deal()
-        dealerCardStr = str(dealerCardInt)
+        dealerCardStr, dealerCardInt = deal()
         dealerCountInt.set(dealerCountInt.get()+dealerCardInt)
         dealerHandStr.set(dealerHandStr.get() + ", " + dealerCardStr)
         root.update()
@@ -62,8 +61,7 @@ def stand():
 
 
 def hit():
-    cardInt = deal()
-    cardStr = str(cardInt)
+    cardStr, cardInt = deal()
     playerCountInt.set(playerCountInt.get()+cardInt)
     playerHandStr.set(playerHandStr.get()+", "+cardStr)
     checkPlayerBust()
@@ -71,11 +69,8 @@ def hit():
 
 
 def newGame():
-    playerCardInt = deal()
-    playerCardStr = str(playerCardInt)
-    dealerCardInt = deal()
-    dealerCardStr = str(dealerCardInt)
-
+    playerCardStr, playerCardInt = deal()
+    dealerCardStr, dealerCardInt = deal()
     dealerCountInt.set(dealerCardInt)
     dealerHandStr.set(dealerCardStr)
     playerCountInt.set(playerCardInt)
@@ -124,8 +119,12 @@ def checkGameState():
 
 
 def deal():
-    card = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    return card
+    cardList = [['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]]
+    index = random.choice(range(0, 13))
+    cardStr = cardList[0][index]
+    cardInt = cardList[1][index]
+    return cardStr, cardInt
 
 
 # Activate GUI loop
