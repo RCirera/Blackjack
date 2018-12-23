@@ -3,93 +3,107 @@
 import tkinter as tk
 from tkinter import ttk
 import time
-import random
+from definitions import Card, Hand
 
+
+# Create the player and dealer hands
+dealer_hand = Hand()
+player_hand = Hand()
 
 # Create the GUI
-
 # Create the root
 root = tk.Tk()
 root.title("Blackjack (Simplified)")
 
 # Create the static labels
-dealerHandLabel = ttk.Label(root, text="Dealer's Hand:", width=12)
-dealerHandLabel.grid(row=0, column=0)
-dealerCountLabel = ttk.Label(root, text="Dealer's Count:", width=12)
-dealerCountLabel.grid(row=1, column=0)
-playerHandLabel = ttk.Label(root, text="Player's Hand:", width=12)
-playerHandLabel.grid(row=2, column=0)
-playerCountLabel = ttk.Label(root, text="Player's Count:", width=12)
-playerCountLabel.grid(row=3, column=0)
+dealer_hand_label = ttk.Label(root, text="Dealer's Hand:", width=12)
+dealer_hand_label.grid(row=0, column=0)
+dealer_count_label = ttk.Label(root, text="Dealer's Count:", width=12)
+dealer_count_label.grid(row=1, column=0)
+
+player_hand_label = ttk.Label(root, text="Player's Hand:", width=12)
+player_hand_label.grid(row=2, column=0)
+player_count_label = ttk.Label(root, text="Player's Count:", width=12)
+player_count_label.grid(row=3, column=0)
 
 # Create the variables
-dealerCountInt = tk.IntVar()
-dealerCountInt.set(0)
-playerCountInt = tk.IntVar()
-playerCountInt.set(0)
-gameStateStr = tk.StringVar()
-gameStateStr.set("Click \'New Game\' to start")
+dealer_hand_str = tk.StringVar()
+dealer_count_int = tk.IntVar()
+dealer_count_int.set(dealer_hand.value)
 
-playerHandStr = tk.StringVar()
-dealerHandStr = tk.StringVar()
+player_hand_str = tk.StringVar()
+player_count_int = tk.IntVar()
+player_count_int.set(player_hand.value)
+
+game_state_str = tk.StringVar()
+game_state_str.set("Click \'New Game\' to start")
 
 # Create the variable labels
-dealerCountVarLabel = ttk.Label(root, textvariable=dealerCountInt)
-dealerCountVarLabel.grid(row=1, column=1)
-playerCountVarLabel = ttk.Label(root, textvariable=playerCountInt)
-playerCountVarLabel.grid(row=3, column=1)
-gameStateVarLabel = ttk.Label(root, textvariable=gameStateStr)
-gameStateVarLabel.grid(row=4, column=0, columnspan=2)
+dealer_hand_var_label = ttk.Label(root, textvariable=dealer_hand_str)
+dealer_hand_var_label.grid(row=0, column=1)
+dealer_count_var_label = ttk.Label(root, textvariable=dealer_count_int)
+dealer_count_var_label.grid(row=1, column=1)
 
-playerHandVarLabel = ttk.Label(root, textvariable=playerHandStr, anchor="w")
-playerHandVarLabel.grid(row=2, column=1)
-dealerHandVarLabel = ttk.Label(root, textvariable=dealerHandStr)
-dealerHandVarLabel.grid(row=0, column=1)
+player_hand_var_label = ttk.Label(root, textvariable=player_hand_str, anchor="w")
+player_hand_var_label.grid(row=2, column=1)
+player_count_var_label = ttk.Label(root, textvariable=player_count_int)
+player_count_var_label.grid(row=3, column=1)
+
+game_state_var_label = ttk.Label(root, textvariable=game_state_str)
+game_state_var_label.grid(row=4, column=0, columnspan=2)
 
 # Define the button functions
 
 
 def stand():
-    while dealerCountInt.get() < 17:
-        dealerCardStr, dealerCardInt = deal()
-        dealerCountInt.set(dealerCountInt.get()+dealerCardInt)
-        dealerHandStr.set(dealerHandStr.get() + ", " + dealerCardStr)
+    hit_button.config(state=tk.DISABLED)
+    stand_button.config(state=tk.DISABLED)
+
+    while dealer_hand.value < 17:
+        dealer_hand.append(Card())
+        dealer_count_int.set(dealer_hand.value)
+        dealer_hand_str.set(dealer_hand.card_faces)
         root.update()
         time.sleep(0.5)
-    checkGameState()
+    check_game_state()
     return
 
 
 def hit():
-    cardStr, cardInt = deal()
-    playerCountInt.set(playerCountInt.get()+cardInt)
-    playerHandStr.set(playerHandStr.get()+", "+cardStr)
-    checkPlayerBust()
+    player_hand.append(Card())
+    player_hand_str.set(player_hand.card_faces)
+    player_count_int.set(player_hand.value)
+    check_player_bust()
     return
 
 
-def newGame():
-    playerCardStr, playerCardInt = deal()
-    dealerCardStr, dealerCardInt = deal()
-    dealerCountInt.set(dealerCardInt)
-    dealerHandStr.set(dealerCardStr)
-    playerCountInt.set(playerCardInt)
-    playerHandStr.set(playerCardStr)
-    gameStateStr.set("Game on")
-    hitButton.config(state=tk.NORMAL)
-    standButton.config(state=tk.NORMAL)
+def new_game():
+    dealer_hand.empty()
+    player_hand.empty()
+    dealer_hand.append(Card())
+    dealer_hand_str.set(dealer_hand.card_faces)
+    dealer_count_int.set(dealer_hand.value)
+
+    player_hand.append(Card())
+    player_hand_str.set(player_hand.card_faces)
+    player_count_int.set(player_hand.value)
+
+    game_state_str.set("Game on")
+
+    hit_button.config(state=tk.NORMAL)
+    stand_button.config(state=tk.NORMAL)
     return
 
 
 # Create the buttons
-hitButton = ttk.Button(root, text="Hit", command=hit, state=tk.DISABLED)
-hitButton.grid(row=5, column=0)
-standButton = ttk.Button(root, text="Stand", command=stand, state=tk.DISABLED)
-standButton.grid(row=5, column=1)
-newGameButton = ttk.Button(root, text="New Game", command=newGame)
-newGameButton.grid(row=6, column=0)
-exitButton = ttk.Button(root, text="Exit", command=quit)
-exitButton.grid(row=6, column=1)
+hit_button = ttk.Button(root, text="Hit", command=hit, state=tk.DISABLED)
+hit_button.grid(row=5, column=0)
+stand_button = ttk.Button(root, text="Stand", command=stand, state=tk.DISABLED)
+stand_button.grid(row=5, column=1)
+new_gameButton = ttk.Button(root, text="New Game", command=new_game)
+new_gameButton.grid(row=6, column=0)
+exit_button = ttk.Button(root, text="Exit", command=quit)
+exit_button.grid(row=6, column=1)
 
 # Add some space between the widgets
 for child in root.winfo_children():
@@ -98,33 +112,23 @@ for child in root.winfo_children():
 
 # Define other functions
 
-def checkPlayerBust():
-    if playerCountInt.get() > 21:
-        gameStateStr.set("Player Bust, Dealer Wins")
-        hitButton.config(state=tk.DISABLED)
-        standButton.config(state=tk.DISABLED)
+def check_player_bust():
+    if player_hand.value > 21:
+        game_state_str.set("Player Busted! Dealer Wins")
+        
+        hit_button.config(state=tk.DISABLED)
+        stand_button.config(state=tk.DISABLED)
 
 
-def checkGameState():
-    hitButton.config(state=tk.DISABLED)
-    standButton.config(state=tk.DISABLED)
-    if dealerCountInt.get() > 21:
-        gameStateStr.set("Dealer Bust! Player Wins!")
-    elif playerCountInt.get() > dealerCountInt.get():
-        gameStateStr.set("Player Wins!")
-    elif playerCountInt.get() == dealerCountInt.get():
-        gameStateStr.set("Tie!")
+def check_game_state():
+    if dealer_hand.value > 21:
+        game_state_str.set("Dealer Busted! Player Wins!")
+    elif player_hand.value > dealer_hand.value:
+        game_state_str.set("Player Wins!")
+    elif player_hand.value == dealer_hand.value:
+        game_state_str.set("Tie!")
     else:
-        gameStateStr.set("Dealer Wins!")
-
-
-def deal():
-    cardList = [['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'],
-                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]]
-    index = random.choice(range(0, 13))
-    cardStr = cardList[0][index]
-    cardInt = cardList[1][index]
-    return cardStr, cardInt
+        game_state_str.set("Dealer Wins!")
 
 
 # Activate GUI loop
